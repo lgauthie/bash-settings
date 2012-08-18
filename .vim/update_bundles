@@ -1,0 +1,55 @@
+#/usr/bin/env ruby
+
+git_bundles = [
+  "git://github.com/godlygeek/tabular.git",
+  "git://github.com/scrooloose/nerdtree.git",
+  "git://github.com/timcharper/textile.vim.git",
+  "git://github.com/tomtom/tcomment_vim.git",
+  "git://github.com/tpope/vim-cucumber.git",
+  "git://github.com/tpope/vim-endwise.git",
+  "git://github.com/tpope/vim-fugitive.git",
+  "git://github.com/tpope/vim-git.git",
+  "git://github.com/tpope/vim-repeat.git",
+  "git://github.com/tpope/vim-surround.git",
+  "git://github.com/majutsushi/tagbar.git",
+  "git://github.com/vim-scripts/taglist.vim.git",
+  "git://github.com/dcsobral/vim-scala.git", 
+  "git://github.com/lukerandall/haskellmode-vim.git",
+  "git://github.com/vim-scripts/LaTeX-Suite-aka-Vim-LaTeX.git",
+  "git://github.com/vim-scripts/c.vim.git",
+  "git://github.com/tpope/vim-markdown.git",
+  "git://github.com/lilydjwg/colorizer.git",
+  "git://github.com/vim-scripts/bandit.vim.git",
+  "git://github.com/vim-jp/cpp-vim.git",
+  "git://github.com/kien/rainbow_parentheses.vim.git",
+  #"git://github.com/tpope/vim-pathogen.git",
+]
+
+hg_bundles = [
+  "https://bitbucket.org/abudden/taghighlight",
+  #"https://bitbucket.org/abudden/easycolour",
+]
+
+require 'fileutils'
+require 'open-uri'
+
+bundles_dir = File.join(File.dirname(__FILE__), "bundle")
+
+FileUtils.cd(bundles_dir)
+
+puts "trashing everything (lookout!)"
+Dir["*"].each {|d| FileUtils.rm_rf d }
+
+git_bundles.each do |url|
+  dir = url.split('/').last.sub(/\.git$/, '')
+  puts "unpacking #{url} into #{dir}"
+  `git clone -q #{url} #{dir}`
+  FileUtils.rm_rf(File.join(dir, ".git"))
+end
+
+hg_bundles.each do |url|
+  dir = url.split('/').last.sub(/\.hg$/, '')
+  puts "unpacking #{url} into #{dir}"
+  `hg clone #{url} #{dir}`
+  FileUtils.rm_rf(File.join(dir, ".hg"))
+end
