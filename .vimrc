@@ -135,7 +135,6 @@ au FocusLost * set number
 au FocusGained * set relativenumber
 autocmd InsertEnter * set number
 autocmd InsertLeave * set relativenumber
-            j
 
 hi CursorLine   cterm=NONE ctermbg=12 
 hi CursorColumn cterm=NONE ctermbg=12
