@@ -146,6 +146,6 @@ let g:EasyColourCustomColours = 1
 au VimEnter * RainbowParenthesesToggle
 au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
-au BufReadPost * if b:current_syntax != "htmljinja"
+au BufReadPost * if exists("b:current_syntax") && b:current_syntax != "htmljinja"
 au BufReadPost * RainbowParenthesesLoadBrace
 au BufReadPost * endif
