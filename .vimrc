@@ -6,19 +6,26 @@ filetype on
 filetype plugin indent on
 filetype plugin on
 set bs=2
+set ttymouse=urxvt
 
 " Pathogen
 "
 call pathogen#infect()
 
+" Golden Ratio Plug
+"
+let g:golden_ratio_autocommand = 0
+map <leader>g :GoldenRatioResize<return>
+
 " USE SYSTEM CLIPBOARD??????
 " Maybe with tmux?
 "set clipboard=unnamed
 
-"  
 set t_Co=256
-colorscheme bandit256
-set background=dark
+colorscheme solarized
+set guifont=Source\ Code\ Pro:h12
+let g:solarized_termcolors=256
+let g:solarized_termtrans = 1
 
 " Automatically fix line length
 "
@@ -32,7 +39,7 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 
-" Sorry vimmers, it's just plain nice to beable to 
+" Sorry vimmers, it's just plain nice to beable to
 " sit back and scroll with the mouse.
 set mouse=a
 
@@ -43,14 +50,14 @@ set laststatus=2
 
 "" Easier split navigation
 "
-map <C-J> <C-W>j<C-W>_ :set relativenumber<Return>
-map <C-K> <C-W>k<C-W>_ :set relativenumber<Return>
-map <C-H> <C-W>h<C-W>_ :set relativenumber<Return>
-map <C-L> <C-W>l<C-W>_ :set relativenumber<Return>
+map <C-J> <C-W>j :call LineNums(1)<return>
+map <C-K> <C-W>k :call LineNums(1)<return>
+map <C-H> <C-W>h :call LineNums(1)<return>
+map <C-L> <C-W>l :call LineNums(1)<return>
 
 " Easy Tab Navigation
-map <C-P> :tabp<Return>
-map <C-N> :tabn<Return>
+noremap <C-P> :tabp<Return>
+noremap <C-N> :tabn<Return>
 
 " better working with long lines
 map j gj
@@ -75,24 +82,43 @@ let filetype_inc='armasm'
 
 " Jinja settings
 autocmd BufNewFile,BufRead *.jinja2 set syntax=htmljinja
-autocmd FileType jinja setlocal noexpandtab
+autocmd BufNewFile,BufRead *.jinja2 set tabstop=4
+autocmd BufNewFile,BufRead *.jinja2 set shiftwidth=4
+autocmd BufNewFile,BufRead *.jinja2 set noexpandtab
+
+" js settings
+"let g:syntastic_javascript_closure_compiler_path = '/Users/lee/working/mediacore/private/plovr/closure/closure-library/compiler.jar'
+autocmd BufNewFile,BufRead *.js set tabstop=2
+autocmd BufNewFile,BufRead *.js set shiftwidth=2
+autocmd BufNewFile,BufRead *.js set expandtab
+autocmd BufNewFile,BufRead *.jinja2js set syntax=htmljinja
+autocmd BufNewFile,BufRead *.jinja2js set tabstop=2
+autocmd BufNewFile,BufRead *.jinja2js set shiftwidth=2
+autocmd BufNewFile,BufRead *.jinja2js set expandtab
 
 " CSS
 autocmd FileType css setlocal noexpandtab
 
 
 " Enable some better java hilighting
-" 
+"
 let java_highlight_all=1
 let java_highlight_functions=1
 
 " Enable full Python highlighting
-" 
+"
 let python_highlight_exceptions = 1
 let python_highlight_builtin_funcs = 1
 let python_highlight_builtin_objs = 1
 let python_slow_sync=1
 let python_highlight_all=1
+
+" Python settings
+" TODO: Make this autocmd stuff a function so it is easier
+"       to remove...
+autocmd BufNewFile,BufRead *.py set tabstop=4
+autocmd BufNewFile,BufRead *.py set shiftwidth=4
+autocmd BufNewFile,BufRead *.py set expandtab
 
 " C++ settings
 "
@@ -112,14 +138,6 @@ map <C-C> <C-P>_
 let g:haddock_browser = 1
 let hs_highlight_delimiters = 1
 
-" au VimEnter * IndentGuidesEnable
-let g:indent_guides_auto_colors = 0
-let g:indent_guides_start_level = 2
-let g:indent_guides_guide_size = 4
-autocmd VimEnter * IndentGuidesEnable
-autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd ctermbg=14
-autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=13
-
 " Relative line settings
 function! NumberToggle()
     if(&relativenumber == 1)
@@ -129,15 +147,25 @@ function! NumberToggle()
     endif
 endfunc
 
-nnoremap <C-B> :call NumberToggle()<cr>
-set relativenumber
-au FocusLost * set number
-au FocusGained * set relativenumber
-autocmd InsertEnter * set number
-autocmd InsertLeave * set relativenumber
+function! LineNums(relative)
+    if (&ft != "nerdtree")
+        if (a:relative == 0)
+            set number
+        elseif (a:relative == 1)
+            set relativenumber
+        endif
+    endif
+endfunc
 
-hi CursorLine   cterm=NONE ctermbg=12 
-hi CursorColumn cterm=NONE ctermbg=12
+nnoremap <C-B> :call NumberToggle()<cr>
+call LineNums(1)
+au FocusLost * call LineNums(0)
+au FocusGained * call LineNums(1)
+autocmd InsertEnter * call LineNums(0)
+autocmd InsertLeave * call LineNums(1)
+
+hi CursorLine   cterm=NONE ctermbg=0
+hi CursorColumn cterm=NONE ctermbg=14
 set cursorline!
 nnoremap <Leader>c :set cursorline! cursorcolumn!<CR>
 
@@ -147,5 +175,25 @@ au VimEnter * RainbowParenthesesToggle
 au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au BufReadPost * if exists("b:current_syntax") && b:current_syntax != "htmljinja"
-au BufReadPost * RainbowParenthesesLoadBrace
+au BufReadPost *    RainbowParenthesesLoadBrace
 au BufReadPost * endif
+
+" Sort a block of imports (or any block. blocks are separated by blank lines
+nnoremap <leader>si vip:!sort\|uniq<cr>
+
+" Split the comma separated import on the current line into two separate
+" imports, then sort. Returns to the same line after, so can be repeated
+" when there are many imports on the same line.
+nnoremap <leader>fi 0v/import<cr>eyf,pF,s<cr><esc>vip:!sort\|uniq<cr>
+
+set incsearch
+set wildmenu
+set wildmode=longest:full
+
+" Easy Retabing!
+command! -nargs=1 -range SuperRetab <line1>,<line2>s/\v%(^ *)@<= {<args>}/\t/g
+
+" Hilight trailing whitespace!
+highlight ExtraWhitespace ctermbg=red guibg=red
+au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+au InsertLeave * match ExtraWhitespace /\s\+$/
