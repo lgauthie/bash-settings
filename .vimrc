@@ -8,6 +8,9 @@ filetype plugin on
 set bs=2
 set ttymouse=urxvt
 
+set nofoldenable
+set lazyredraw
+
 " Pathogen
 "
 call pathogen#infect()
@@ -15,17 +18,19 @@ call pathogen#infect()
 " Golden Ratio Plug
 "
 let g:golden_ratio_autocommand = 0
-map <leader>g :GoldenRatioResize<return>
+map <leader><leader> :GoldenRatioResize<return>
 
 " USE SYSTEM CLIPBOARD??????
 " Maybe with tmux?
 "set clipboard=unnamed
 
 set t_Co=256
-colorscheme solarized
+colo xoria256
+"colorscheme solarized
+" colorscheme grb256
 set guifont=Source\ Code\ Pro:h12
-let g:solarized_termcolors=256
-let g:solarized_termtrans = 1
+"let g:solarized_termcolors=256
+"let g:solarized_termtrans = 1
 
 " Automatically fix line length
 "
@@ -50,10 +55,10 @@ set laststatus=2
 
 "" Easier split navigation
 "
-map <C-J> <C-W>j :call LineNums(1)<return>
-map <C-K> <C-W>k :call LineNums(1)<return>
-map <C-H> <C-W>h :call LineNums(1)<return>
-map <C-L> <C-W>l :call LineNums(1)<return>
+nnoremap <C-J> <C-W>j :call LineNums(1)<return>
+nnoremap <C-K> <C-W>k :call LineNums(1)<return>
+nnoremap <C-H> <C-W>h :call LineNums(1)<return>
+nnoremap <C-L> <C-W>l :call LineNums(1)<return>
 
 " Easy Tab Navigation
 noremap <C-P> :tabp<Return>
@@ -97,13 +102,17 @@ autocmd BufNewFile,BufRead *.jinja2js set shiftwidth=2
 autocmd BufNewFile,BufRead *.jinja2js set expandtab
 
 " CSS
+"
 autocmd FileType css setlocal noexpandtab
 
 
-" Enable some better java hilighting
+" Java Settings
 "
 let java_highlight_all=1
 let java_highlight_functions=1
+
+autocmd FileType java setlocal noexpandtab
+autocmd FileType jsp setlocal noexpandtab
 
 " Enable full Python highlighting
 "
@@ -116,15 +125,16 @@ let python_highlight_all=1
 " Python settings
 " TODO: Make this autocmd stuff a function so it is easier
 "       to remove...
-autocmd BufNewFile,BufRead *.py set tabstop=4
-autocmd BufNewFile,BufRead *.py set shiftwidth=4
-autocmd BufNewFile,BufRead *.py set expandtab
+autocmd FileType py setlocal tabstop=4
+autocmd FileType py setlocal shiftwidth=4
+autocmd FileType py setlocal expandtab
 
 " C++ settings
 "
 autocmd FileType h setlocal noexpandtab
 autocmd FileType cpp setlocal noexpandtab
 autocmd FileType c setlocal noexpandtab
+
 
 " Search hilighting.  <Space> clears the highlight
 set hlsearch
@@ -148,7 +158,7 @@ function! NumberToggle()
 endfunc
 
 function! LineNums(relative)
-    if (&ft != "nerdtree")
+    if (&ft != "nerdtree" && &ft != "gitv")
         if (a:relative == 0)
             set number
         elseif (a:relative == 1)
@@ -197,3 +207,25 @@ command! -nargs=1 -range SuperRetab <line1>,<line2>s/\v%(^ *)@<= {<args>}/\t/g
 highlight ExtraWhitespace ctermbg=red guibg=red
 au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 au InsertLeave * match ExtraWhitespace /\s\+$/
+
+" Gitv
+let g:Gitv_DoNotMapCtrlKey=1
+let g:Gitv_OpenPreviewOnLaunch=1
+cnoreabbrev gitx Gitv
+
+" Fugitive stuff
+cnoreabbrev gits Gstatus
+cnoreabbrev gitd Gdiff
+cnoreabbrev git Git
+cnoreabbrev gitrbi Git rebase -i
+cnoreabbrev gitrbo Git rebase --onto
+cnoreabbrev gitrbc Git rebase --continue
+cnoreabbrev gitpo Git push origin
+
+" Diff Stuff
+nnoremap ,p :diffput<return>
+nnoremap ,g :diffget<return>
+nnoremap ,u :diffupdate<return>
+
+vnoremap ,p :diffput<return>
+vnoremap ,g :diffget<return>
