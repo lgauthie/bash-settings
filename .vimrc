@@ -10,6 +10,7 @@ set ttymouse=urxvt
 
 set nofoldenable
 set lazyredraw
+set clipboard=unnamed
 
 " Pathogen
 "
